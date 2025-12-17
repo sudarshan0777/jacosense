@@ -10,7 +10,7 @@
 
   <script>
     async function loadData() {
-      const res = await fetch("/api/app");
+      const res = await fetch("/api/model");
       const data = await res.json();
       document.getElementById("output").innerText =
         JSON.stringify(data, null, 2);
