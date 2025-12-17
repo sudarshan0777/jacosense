@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JacoSense | Live Market Sensitivity & Decision Model</title>
+    <meta http-equiv="refresh" content="4">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com/css2">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-bg: #2c3e50;
+            --card-bg: #ffffff;
+            --accent-blue: #3498db;
+            --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .dashboard-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0 0 20px 0;
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        /* 5-item Grid for Inputs */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .metric-box {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Price Section */
+        .price-section {
+            background: var(--primary-bg);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .price-label { font-size: 0.8rem; opacity: 0.8; }
+        .price-value { font-size: 1.8rem; font-weight: 600; }
+
+        /* Jacobian List */
+        .jacobian-container {
+            text-align: left;
+            background: #f1f4f8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .jacobian-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .jacobian-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-family: 'Courier New', monospace; /* Monospace for alignment */
+        }
+        .jacobian-item:last-child { border-bottom: none; }
+
+        /* Decision Box */
+        .decision-box {
+            border: 2px solid var(--primary-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            background: #fff;
+        }
+
+        .decision-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .decision-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 5px 0;
+        }
+
+        .decision-reason {
+            font-style: italic;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .footer-info {
+            margin-top: 25px;
+            font-size: 0.75rem;
+            color: #bdc3c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .live-dot {
+            height: 8px;
+            width: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="dashboard-card">
+        <h2>Market Sensitivity Model</h2>
+
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <span class="metric-label">Demand</span>
+                <span class="metric-value">{{ D }}</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-label">Volatility</span>
+                <span class="metric-value">{{ V }}</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-label">Liquidity</span>
+                <span class="metric-value">{{ L }}</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-label">Trend</span>
+                <span class="metric-value">{{ T }}</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-label">Vol Chg</span>
+                <span class="metric-value">{{ C }}</span>
+            </div>
+        </div>
+
+        <div class="price-section">
+            <div class="price-label">Current Market Price</div>
+            <div class="price-value">{{ price }}</div>
+        </div>
+
+        <div class="jacobian-container">
+            <span class="jacobian-title">Jacobian Sensitivities ($$J$$)</span>
+            {% for key, value in jacobian.items() %}
+                <div class="jacobian-item">
+                    <span>∂Price / ∂{{ key }}</span>
+                    <span>{{ value }}</span>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="decision-box">
+            <div class="decision-title">System Recommendation</div>
+            <div class="decision-value">{{ decision }}</div>
+            <div class="decision-reason">"{{ reason }}"</div>
+        </div>
+
+        <div class="footer-info">
+            <span class="live-dot"></span>
+            Simulated Academic Model • Auto-refresh active (4s) | NMIET G Division
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
