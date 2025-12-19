@@ -2,25 +2,31 @@ import numpy as np
 import json
 
 def handler(request):
-    D = np.random.uniform(10, 50)
-    V = np.random.uniform(1, 5)
-    L = np.random.uniform(5, 20)
-    T = np.random.uniform(-3, 3)
-    C = np.random.uniform(-10, 10)
+    D = np.random.uniform(10, 50) # Demand
+    V = np.random.uniform(1, 5) # Volatility
+    L = np.random.uniform(5, 20) # Liquidity
 
-    price = 2*D + 0.5*(V**2) - L + 1.5*T + 0.2*C
+    # Price function
+    price = 2*D + 0.5*(V**2) - L
 
+    # Jacobian (partial derivatives)
     jacobian = {
         "Demand": 2,
         "Volatility": round(V, 2),
-        "Liquidity": -1,
-        "Trend": 1.5,
-        "Volume": 0.2
+        "Liquidity": -1
     }
 
-    if jacobian["Demand"] > 1.5 and T > 0:
+    # Sensitivity score (Using Jacobian)
+    sensitivity_score = (
+        jacobian["Demand"] * D +
+        jacobian["Volatility"] * V +
+        jacobian["Liquidity"] * L
+    )
+
+    # Decision logic using sensitivity
+    if sensitivity_score > 80:
         decision = "BUY"
-    elif T < 0:
+    elif sensitivity_score < 40:
         decision = "SELL"
     else:
         decision = "HOLD"
@@ -29,13 +35,12 @@ def handler(request):
         "statusCode": 200,
         "headers": {"Content-Type": "application/json"},
         "body": json.dumps({
-            "Demand": round(D,2),
-            "Volatility": round(V,2),
-            "Liquidity": round(L,2),
-            "Trend": round(T,2),
-            "VolumeChange": round(C,2),
-            "Price": round(price,2),
+            "Demand": round(D, 2),
+            "Volatility": round(V, 2),
+            "Liquidity": round(L, 2),
+            "Price": round(price, 2),
             "Jacobian": jacobian,
+            "SensitivityScore": round(sensitivity_score, 2),
             "Decision": decision
         })
     }
